@@ -1,0 +1,11 @@
+name = "arsenic"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[assets]
+directory = "./public"
+
+# If you add a custom domain later, uncomment and fill in:
+# routes = [
+#   { pattern = "worker.your-domain.com", custom_domain = true }
+# ]

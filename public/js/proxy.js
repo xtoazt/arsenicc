@@ -40,13 +40,19 @@ const helper = new UrlInfoHelper();
 
 function getProxyUrl(url) {
   const proxyType = localStorage.getItem('proxy-backend');
+  const prefix = proxyType === 'dynamic' ? '/service/dynamic/' : '/service/uv/';
 
-  if (proxyType === "dynamic") {
-    return "/service/dynamic/" + __uv$config.encodeUrl(url);
-  } else {
-    return "/service/uv/" + __uv$config.encodeUrl(url);
+  // GAMP / AMP cache: the page runs on cdn.ampproject.org but the
+  // proxy iframe must load from the worker origin where the SW is
+  // actually registered via the hidden iframe in sw-register.html.
+  if (
+    window.__ARSENIC_ORIGIN__ &&
+    location.origin !== window.__ARSENIC_ORIGIN__
+  ) {
+    return window.__ARSENIC_ORIGIN__ + prefix + __uv$config.encodeUrl(url);
   }
-  
+
+  return prefix + __uv$config.encodeUrl(url);
 }
 
 form.addEventListener("submit", async (event) => {

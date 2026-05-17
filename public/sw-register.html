@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SW Register</title>
+</head>
+<body>
+  <script>
+    (async function() {
+      async function waitForActivation(reg) {
+        const sw = reg.installing || reg.waiting || reg.active;
+        if (!sw || sw.state === 'activated') return;
+        await new Promise(resolve => {
+          sw.addEventListener('statechange', function handler() {
+            if (sw.state === 'activated') {
+              sw.removeEventListener('statechange', handler);
+              resolve();
+            }
+          });
+        });
+      }
+
+      const registrations = [];
+      try {
+        registrations.push(navigator.serviceWorker.register('/uv.sw.js', { scope: '/service/uv/' }));
+      } catch (e) { console.error('UV SW register failed:', e); }
+
+      try {
+        registrations.push(navigator.serviceWorker.register('/dynamic.sw.js', { scope: '/service/dynamic/' }));
+      } catch (e) { console.error('Dynamic SW register failed:', e); }
+
+      try {
+        registrations.push(navigator.serviceWorker.register('/scramjet.sw.js', { scope: '/service/scramjet/' }));
+      } catch (e) { console.error('Scramjet SW register failed:', e); }
+
+      try {
+        const results = await Promise.allSettled(registrations);
+        const regs = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+        await Promise.all(regs.map(waitForActivation));
+      } catch (e) {
+        console.error('SW activation failed:', e);
+      }
+
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'arsenic-sw-ready' }, '*');
+      }
+    })();
+  </script>
+</body>
+</html>
