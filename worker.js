@@ -281,7 +281,8 @@ function fontBomb(bodyBytes) {
 //  Worker: worker.workers.dev
 // ---------------------------------------------------------------------------
 function normalizeGamp(url) {
-  const gampMatch = url.pathname.match(/^\/r\/s\/([^/]+)(\/.*)?$/);
+  const isAmpHost = url.host.endsWith(".cdn.ampproject.org");
+  const gampMatch = isAmpHost && url.pathname.match(/^\/r\/s\/([^/]+)(\/.*)?$/);
   if (gampMatch) {
     const workerDomain = gampMatch[1];
     const assetPath = gampMatch[2] || "/";
@@ -518,12 +519,21 @@ export default {
     let assetRequest = new Request(assetUrl, request);
     let assetResponse = await env.ASSETS.fetch(assetRequest);
 
-    // SPA fallback: if no file extension, try index.html
+    // SPA fallback: if no file extension, try index.html — but only for
+    // top-level navigations (not /assets/, /uv/, /js/, etc.) so missing game
+    // directories don't accidentally render the SPA inside an iframe.
     const lastSegment = path.split("/").pop();
     const hasExtension = lastSegment.includes(".");
+    const isTopLevel = !path.startsWith("/assets/") &&
+                       !path.startsWith("/uv/") &&
+                       !path.startsWith("/dynamic/") &&
+                       !path.startsWith("/aero/") &&
+                       !path.startsWith("/js/") &&
+                       !path.startsWith("/css/");
     if (
       assetResponse.status === 404 &&
       !hasExtension &&
+      isTopLevel &&
       request.method !== "OPTIONS"
     ) {
       const indexUrl = new URL("/index.html", "http://localhost");

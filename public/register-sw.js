@@ -52,6 +52,7 @@ async function registerSW() {
       const cleanup = () => {
         clearTimeout(timeout);
         window.removeEventListener('message', onMessage);
+        if (iframe && iframe.parentNode) iframe.remove();
       };
 
       window.addEventListener('message', onMessage);
