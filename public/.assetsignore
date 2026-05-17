@@ -1,0 +1,20 @@
+# Exclude game directories containing files >25 MiB (Cloudflare Workers asset limit)
+assets/games/armed-forces-io/**
+assets/games/bank-robbery/**
+assets/games/bank-robbery-2/**
+assets/games/bank-robbery-3/**
+assets/games/blumgi-dragon/**
+assets/games/crazy-cattle-3d/**
+assets/games/crazy-chicken-3d/**
+assets/games/dadish-3d/**
+assets/games/doors-online/**
+assets/games/fleeing-the-complex/**
+assets/games/funny-shooter-2/**
+assets/games/idle-light-city/**
+assets/games/infiltrating-the-airship/**
+assets/games/not-not/**
+assets/games/race-survival-arena-king/**
+assets/games/racing-limits/**
+assets/games/space-wars-battleground/**
+assets/games/tanuki-sunset/**
+assets/games/turbo-moto-racer/**
